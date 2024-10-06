@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Name Search</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
+
+    h1 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    input[type="range"] {
+        width: 80%;
+        margin-bottom: 10px;
+    }
+
+    input[type="text"] {
+        padding: 10px;
+        width: 200px;
+        margin-right: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    button {
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .box {
+        background: skyblue;
+        color: white;
+        text-align: center;
+        padding: 20px;
+        width: 120px;
+        height: 120px;
+        border-radius: 10px;
+        margin: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .box.female {
+        background: pink;
+    }
+
+    .title {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+</style>
+</head>
+<body>
+    <body>
+    <h1>Name Search</h1>
+    <input type="range" min="1880" max="2023" value="2023" id="yr">
+    <span id="rng">2023</span>
+    <div>
+        <input id="text" placeholder="Enter a name">
+        <button id="btn">Search</button>
+    </div>
+    <div class="container">
+        <div class="box" id="M">
+            <span class="title">Male</span>
+            <span id="nam"></span>
+            <span id="numm"></span>
+        </div>
+        <div class="box female" id="F">
+            <span class="title">Female</span>
+            <span id="naf"></span>
+            <span id="numf"></span>
+        </div>
+    </div>
+</body>
+
+
+    <script>
+    function sortNamesByGender(yearData) {
+    var maleNames = [];
+    var femaleNames = [];
+
+    for (var i = 0; i < yearData.length; i++) {
+        var item = yearData[i].split(','); // Split the string into name, gender, and number
+        var name = item[0];
+        var gender = item[1];
+        var number = parseInt(item[2]);
+
+        // Sort into male or female arrays based on gender
+        if (gender === 'M') {
+            maleNames.push([name, number]);
+        } else if (gender === 'F') {
+            femaleNames.push([name, number]);
+        }
+    }
+
+    return {
+        maleNames: maleNames,
+        femaleNames: femaleNames
+    };
+}
+
+// Correct data structure
+var data = [
+    [2022, "Olivia,F,1000", "Liam,M,900", "Emma,F,850", "Noah,M,920", "Noah,F,150"],
+    [2023, "Olivia,F,1008", "Liam,M,900", "Emma,F,850", "Noah,M,920", "Noah,F,110"]
+];
+var searchName = "";
+
+// Function to initialize and update results based on the selected year
+function updateResults() {
+    var currentYear = parseInt(document.getElementById('yr').value);
+    var yearData = [];
+
+    // Find the data for the selected year
+    for (var j = 0; j < data.length; j++) {
+        if (data[j][0] === currentYear) {
+            yearData = data[j].slice(1); // Get data for the selected year
+            break;
+        }
+    }
+
+    // Sort names by gender for the selected year
+    var result = sortNamesByGender(yearData);
+    var mNames = result.maleNames;
+    var fNames = result.femaleNames;
+
+    // Set a random placeholder
+    setRandomPlaceholder(mNames, fNames);
+
+    // Display results for the current search
+    displayResults(mNames, fNames);
+}
+
+// Function to set a random placeholder
+function setRandomPlaceholder(mNames, fNames) {
+    var allNames = mNames.concat(fNames);
+    if (allNames.length > 0) {
+        var randomIndex = Math.floor(Math.random() * allNames.length);
+        var randomName = allNames[randomIndex][0]; // Get the name
+        document.getElementById("text").placeholder = randomName;
+    }
+}
+
+// Function to display results based on the searched name
+function displayResults(mNames, fNames) {
+    var mres = "<5";
+    var fres = "<5";
+
+    // Check in male names
+    for (var i = 0; i < mNames.length; i++) {
+        if (mNames[i][0].toLowerCase() === searchName) {
+            mres = mNames[i][1]; // Return the number associated with the male name
+            break; // Stop once found
+        }
+    }
+
+    // Optionally, check in female names too
+    for (var i = 0; i < fNames.length; i++) {
+        if (fNames[i][0].toLowerCase() === searchName) {
+            fres = fNames[i][1]; // Return the number associated with the female name
+            break; // Stop once found
+        }
+    }
+
+    document.getElementById("nam").textContent = searchName || "No name entered";
+    document.getElementById("numm").textContent = mres;
+    document.getElementById("naf").textContent = searchName || "No name entered";
+    document.getElementById("numf").textContent = fres;
+}
+
+// Update results when the year is changed
+document.getElementById('yr').addEventListener("input", function() {
+    document.getElementById("rng").textContent = document.getElementById('yr').value;
+    updateResults();
+});
+
+// Search button click event
+document.getElementById("btn").addEventListener("click", function() {
+    searchName = document.getElementById("text").value.toLowerCase();
+
+    // Check if name is empty
+    if (!searchName) {
+        document.getElementById("nam").textContent = "No name entered";
+        document.getElementById("numm").textContent = "<5";
+        document.getElementById("naf").textContent = "No name entered";
+        document.getElementById("numf").textContent = "<5";
+        return;
+    }
+
+    // Display results for the current search
+    updateResults();
+});
+
+// Initialize display for the default year
+updateResults();
+
+
+</script>
+
+</body>
+</html>
