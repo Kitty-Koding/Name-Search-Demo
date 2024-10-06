@@ -177,28 +177,31 @@ var searchName = "";
         }
 
         function displayResults(mNames, fNames) {
-            var mres = "<5";
-            var fres = "<5";
+    var mres = "<5";
+    var fres = "<5";
 
-            for (var i = 0; i < mNames.length; i++) {
-                if (mNames[i][0].toLowerCase() === searchName) {
-                    mres = mNames[i][1];
-                    break;
-                }
-            }
-
-            for (var i = 0; i < fNames.length; i++) {
-                if (fNames[i][0].toLowerCase() === searchName) {
-                    fres = fNames[i][1];
-                    break;
-                }
-            }
-
-            document.getElementById("nam").textContent = searchName || "No name entered";
-            document.getElementById("numm").textContent = mres;
-            document.getElementById("naf").textContent = searchName || "No name entered";
-            document.getElementById("numf").textContent = fres;
+    for (var i = 0; i < mNames.length; i++) {
+        if (mNames[i][0].toLowerCase() === searchName) {
+            mres = mNames[i][1];
+            break;
         }
+    }
+
+    for (var i = 0; i < fNames.length; i++) {
+        if (fNames[i][0].toLowerCase() === searchName) {
+            fres = fNames[i][1];
+            break;
+        }
+    }
+
+    document.getElementById("nam").textContent = searchName || "No name entered";
+    document.getElementById("numm").textContent = mres;
+    document.getElementById("naf").textContent = searchName || "No name entered";
+    document.getElementById("numf").textContent = fres;
+
+    // Call updateChart after displaying results
+    updateChart();
+}
 
         function updateChart() {
             var labels = [];
