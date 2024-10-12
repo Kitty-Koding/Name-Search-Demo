@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Name Search</title>
     <style>
         body {
@@ -12,77 +13,32 @@
             align-items: center;
             padding: 20px;
         }
-
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        input[type="range"] {
-            width: 80%;
-            margin-bottom: 10px;
-        }
-
+        h1 { color: #333; margin-bottom: 20px; }
+        input[type="range"] { width: 80%; margin-bottom: 10px; }
         input[type="text"] {
-            padding: 10px;
-            width: 200px;
-            margin-right: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            padding: 10px; width: 200px; margin-right: 10px;
+            border: 1px solid #ccc; border-radius: 5px;
         }
-
         button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            padding: 10px 15px; background-color: #007bff; color: white;
+            border: none; border-radius: 5px; cursor: pointer;
             transition: background-color 0.3s;
         }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
+        button:hover { background-color: #0056b3; }
         .container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-            width: 100%;
-            flex-wrap: wrap;
+            display: flex; justify-content: center; margin-top: 20px;
+            width: 100%; flex-wrap: wrap;
         }
-
         .box {
-            background: skyblue;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            width: 120px;
-            height: 120px;
-            border-radius: 10px;
-            margin: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            background: skyblue; color: white; text-align: center;
+            padding: 20px; width: 120px; height: 120px; border-radius: 10px;
+            margin: 10px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-
-        .box.female {
-            background: pink;
-        }
-
-        .title {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        canvas {
-            margin-top: 20px;
-            width: 80% !important;
-            max-width: 600px;
-        }
+        .box.female { background: pink; }
+        .title { font-weight: bold; margin-bottom: 5px; }
+        canvas { margin-top: 20px; width: 80% !important; max-width: 600px; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -109,106 +65,51 @@
     <canvas id="nameChart"></canvas>
 
     <script>
-        function sortNamesByGender(yearData) {
-            var maleNames = [];
-            var femaleNames = [];
-
-            for (var i = 0; i < yearData.length; i++) {
-                var item = yearData[i].split(',');
-                var name = item[0];
-                var gender = item[1];
-                var number = parseInt(item[2]);
-
-                if (gender === 'M') {
-                    maleNames.push([name, number]);
-                } else if (gender === 'F') {
-                    femaleNames.push([name, number]);
-                }
-            }
-
-            return {
-                maleNames: maleNames,
-                femaleNames: femaleNames
-            };
-        }
-
-        var data = [
+        const data = [
             [2020, "Olivia,F,1200", "Noah,M,100", "Liam,M,1500"],
             [2021, "Olivia,F,1201", "Noah,M,110", "Liam,M,1600"],
             [2022, "Olivia,F,1300", "Noah,M,120"],
             [2023, "Olivia,F,1250", "Noah,M,130", "Liam,M,1700"]
         ];
 
-        var searchName = "";
+        let searchName = "";
 
-        function updateResults() {
-            var currentYear = parseInt(document.getElementById('yr').value);
-            var yearData = [];
-
-            for (var j = 0; j < data.length; j++) {
-                if (data[j][0] === currentYear) {
-                    yearData = data[j].slice(1);
-                    break;
-                }
-            }
-
-            var result = sortNamesByGender(yearData);
-            var mNames = result.maleNames;
-            var fNames = result.femaleNames;
-
-            setRandomPlaceholder(mNames, fNames);
-            displayResults(mNames, fNames);
-            createChart(); // Create a new chart each time
+        function sortNamesByGender(yearData) {
+            const maleNames = [], femaleNames = [];
+            yearData.forEach(item => {
+                const [name, gender, number] = item.split(',');
+                if (gender === 'M') maleNames.push([name, parseInt(number)]);
+                else if (gender === 'F') femaleNames.push([name, parseInt(number)]);
+            });
+            return { maleNames, femaleNames };
         }
 
-        function setRandomPlaceholder(mNames, fNames) {
-            var allNames = mNames.concat(fNames);
-            if (allNames.length > 0) {
-                var randomIndex = Math.floor(Math.random() * allNames.length);
-                var randomName = allNames[randomIndex][0];
-                document.getElementById("text").placeholder = randomName;
-            }
+        function updateResults() {
+            const currentYear = parseInt(document.getElementById('yr').value);
+            const yearData = data.find(entry => entry[0] === currentYear)?.slice(1) || [];
+
+            const result = sortNamesByGender(yearData);
+            displayResults(result.maleNames, result.femaleNames);
+            createChart();
         }
 
         function displayResults(mNames, fNames) {
-            var mres = "<5";
-            var fres = "<5";
+            const maleResult = mNames.find(name => name[0].toLowerCase() === searchName) || ["No name entered", "<5"];
+            const femaleResult = fNames.find(name => name[0].toLowerCase() === searchName) || ["No name entered", "<5"];
 
-            for (var i = 0; i < mNames.length; i++) {
-                if (mNames[i][0].toLowerCase() === searchName) {
-                    mres = mNames[i][1];
-                    break;
-                }
-            }
-
-            for (var i = 0; i < fNames.length; i++) {
-                if (fNames[i][0].toLowerCase() === searchName) {
-                    fres = fNames[i][1];
-                    break;
-                }
-            }
-
-            document.getElementById("nam").textContent = searchName || "No name entered";
-            document.getElementById("numm").textContent = mres;
-            document.getElementById("naf").textContent = searchName || "No name entered";
-            document.getElementById("numf").textContent = fres;
+            document.getElementById("nam").textContent = maleResult[0];
+            document.getElementById("numm").textContent = maleResult[1];
+            document.getElementById("naf").textContent = femaleResult[0];
+            document.getElementById("numf").textContent = femaleResult[1];
         }
 
         function createChart() {
-            var labels = [];
-            var maleData = [];
-            var femaleData = [];
+            const labels = data.map(entry => entry[0]);
+            const maleData = data.map(entry => getTotalNames(sortNamesByGender(entry.slice(1)).maleNames));
+            const femaleData = data.map(entry => getTotalNames(sortNamesByGender(entry.slice(1)).femaleNames));
 
-            for (var j = 0; j < data.length; j++) {
-                labels.push(data[j][0]);
-                var yearData = sortNamesByGender(data[j].slice(1));
-                maleData.push(getTotalNames(yearData.maleNames));
-                femaleData.push(getTotalNames(yearData.femaleNames));
-            }
+            const ctx = document.getElementById('nameChart').getContext('2d');
 
-            var ctx = document.getElementById('nameChart').getContext('2d');
-
-            // Clear previous chart if it exists
             if (window.nameChart) {
                 window.nameChart.destroy();
             }
@@ -217,57 +118,30 @@
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: 'Male Names',
-                        data: maleData,
-                        borderColor: 'blue',
-                        fill: false,
-                        borderWidth: 2
-                    }, {
-                        label: 'Female Names',
-                        data: femaleData,
-                        borderColor: 'pink',
-                        fill: false,
-                        borderWidth: 2
-                    }]
+                    datasets: [
+                        { label: 'Male Names', data: maleData, borderColor: 'blue', fill: false, borderWidth: 2 },
+                        { label: 'Female Names', data: femaleData, borderColor: 'pink', fill: false, borderWidth: 2 }
+                    ]
                 },
                 options: {
                     responsive: true,
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Names'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Year'
-                            }
-                        }
+                        y: { beginAtZero: true, title: { display: true, text: 'Number of Names' } },
+                        x: { title: { display: true, text: 'Year' } }
                     },
                     plugins: {
-                        title: {
-                            display: true,
-                            text: 'Popularity of Names Over the Years'
-                        }
+                        title: { display: true, text: 'Popularity of Names Over the Years' }
                     }
                 }
             });
         }
 
         function getTotalNames(namesArray) {
-            var total = 0;
-            for (var i = 0; i < namesArray.length; i++) {
-                total += namesArray[i][1];
-            }
-            return total;
+            return namesArray.reduce((total, name) => total + name[1], 0);
         }
 
         document.getElementById('yr').addEventListener("input", function() {
-            document.getElementById("rng").textContent = document.getElementById('yr').value;
+            document.getElementById("rng").textContent = this.value;
             updateResults();
         });
 
@@ -277,11 +151,10 @@
                 alert("Please enter a name to search.");
                 return;
             }
-            updateResults(); // Update results when search button is pressed
+            updateResults();
         });
 
-        // Initialize display for the default year
-        updateResults();
+        updateResults(); // Initialize display for the default year
     </script>
 </body>
 </html>
